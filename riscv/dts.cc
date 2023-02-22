@@ -47,6 +47,18 @@ std::string make_dts(size_t insns_per_rtc_tick, size_t cpu_hz,
     s << bootargs[i];
   }
     s << "\";\n";
+
+    s <<
+         "    framebuffer0: framebuffer@0xA0096000 {\n"
+         "      compatible = \"simple-framebuffer\";\n"
+         "      reg = <0xA0096000 (640*480*4)>;\n"
+         "      width = <640>;\n"
+         "      height = <480>;\n"
+         "      stride = <(640*4)>;\n"
+         "      format = \"a8b8g8r8\";\n"
+         "      status = \"okay\";\n"
+         "    };\n";
+
     s << "  };\n"
          "  cpus {\n"
          "    #address-cells = <1>;\n"
