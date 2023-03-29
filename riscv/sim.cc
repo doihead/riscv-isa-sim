@@ -21,6 +21,7 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 
+long cursed_counter = 0;
 volatile bool ctrlc_pressed = false;
 static void handle_signal(int sig)
 {
@@ -57,7 +58,8 @@ sim_t::sim_t(const cfg_t *cfg, bool halted,
     histogram_enabled(false),
     log(false),
     remote_bitbang(NULL),
-    debug_module(this, dm_config)
+    debug_module(this, dm_config),
+    framebuffer(fb_device_t())
 {
   signal(SIGINT, &handle_signal);
 
@@ -68,6 +70,8 @@ sim_t::sim_t(const cfg_t *cfg, bool halted,
 
   for (auto& x : plugin_devices)
     bus.add_device(x.first, x.second);
+
+  bus.add_device(0x40000000, &framebuffer);
 
   debug_module.add_device(&bus);
 
@@ -247,6 +251,15 @@ void sim_t::step(size_t n)
       }
     }
   }
+
+  // if ((cursed_counter % (1lu<<16)) == 0) {
+    // printf("Counter Num: %ld\n", cursed_counter);
+    // std::vector<char> buf = ((fb_device_t*) bus.find_device(0x40000000).second)->data;
+    // for (char i: buf)
+      // printf("%X", i);
+    // printf("\n");
+  // }
+  // cursed_counter ++;
 }
 
 void sim_t::set_debug(bool value)

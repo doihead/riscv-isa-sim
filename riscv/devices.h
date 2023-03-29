@@ -56,6 +56,17 @@ class mem_t : public abstract_device_t {
   reg_t sz;
 };
 
+class fb_device_t : public abstract_device_t {
+ public:
+  fb_device_t();
+  ~fb_device_t();
+  bool load(reg_t addr, size_t len, uint8_t* bytes);
+  bool store(reg_t addr, size_t len, const uint8_t* bytes);
+ public:
+  char* data;
+  int fd;
+};
+
 class clint_t : public abstract_device_t {
  public:
   clint_t(simif_t*, uint64_t freq_hz, bool real_time);

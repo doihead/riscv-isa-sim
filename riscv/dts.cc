@@ -48,13 +48,15 @@ std::string make_dts(size_t insns_per_rtc_tick, size_t cpu_hz,
   }
     s << "\";\n";
 
-    s <<
-         "    framebuffer0: framebuffer@0xA0096000 {\n"
+    s << "    ranges;\n"
+         "    #address-cells = <1>;\n"
+         "    #size-cells = <1>;\n"
+         "    framebuffer0: framebuffer@40000000 {\n"
          "      compatible = \"simple-framebuffer\";\n"
-         "      reg = <0xA0096000 (640*480*4)>;\n"
-         "      width = <640>;\n"
-         "      height = <480>;\n"
-         "      stride = <(640*4)>;\n"
+         "      reg = <0x40000000 (800*600*4)>;\n"
+         "      width = <800>;\n"
+         "      height = <600>;\n"
+         "      stride = <(800*4)>;\n"
          "      format = \"a8b8g8r8\";\n"
          "      status = \"okay\";\n"
          "    };\n";

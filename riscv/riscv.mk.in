@@ -71,6 +71,7 @@ riscv_srcs = \
 	socketif.cc \
 	cfg.cc \
 	$(riscv_gen_srcs) \
+	framebuffer.cc \
 
 riscv_test_srcs =
 
