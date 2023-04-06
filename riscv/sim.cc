@@ -152,6 +152,10 @@ sim_t::sim_t(const cfg_t *cfg, bool halted,
     bus.add_device(ns16550_base, ns16550.get());
   }
 
+  ps2.reset(new altera_ps2_t(intctrl, ALTPS2_INTERRUPT_ID));
+
+  bus.add_device(ALTPS2_BASE, ps2.get());
+  
   //per core attribute
   int cpu_offset = 0, rc;
   size_t cpu_idx = 0;

@@ -1,12 +1,11 @@
 #include "devices.h"
+#include "platform.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <unistd.h>
-
-#define FB_SIZE 1920000
 
 fb_device_t::fb_device_t()
 {

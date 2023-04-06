@@ -57,7 +57,7 @@ std::string make_dts(size_t insns_per_rtc_tick, size_t cpu_hz,
          "      width = <800>;\n"
          "      height = <600>;\n"
          "      stride = <(800*4)>;\n"
-         "      format = \"a8b8g8r8\";\n"
+         "      format = \"a8r8g8b8\";\n"
          "      status = \"okay\";\n"
          "    };\n";
 
@@ -138,6 +138,12 @@ std::string make_dts(size_t insns_per_rtc_tick, size_t cpu_hz,
                      " 0x" << (ns16550sz >> 32) << " 0x" << (ns16550sz & (uint32_t)-1) << ">;\n"
          "      reg-shift = <0x" << NS16550_REG_SHIFT << ">;\n"
          "      reg-io-width = <0x" << NS16550_REG_IO_WIDTH << ">;\n"
+         "    };\n"
+         "  ps2@" << ALTPS2_BASE << " {\n"
+         "      compatible = \"ALTR,ps2-1.0\";\n"
+         "      reg = <0x" << ALTPS2_BASE << " " << ALTPS2_SIZE << ">;\n"
+         "      interrupt-parent = <&PLIC>;\n"
+         "      interrupts = <" << std::dec << ALTPS2_INTERRUPT_ID;
          "    };\n"
          "  };\n"
          "  htif {\n"

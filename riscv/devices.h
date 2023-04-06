@@ -135,6 +135,20 @@ class plic_t : public abstract_device_t, public abstract_interrupt_controller_t 
                      reg_t offset, uint32_t val);
 };
 
+class altera_ps2_t : public abstract_device_t {
+ public:
+  altera_ps2_t(abstract_interrupt_controller_t *intctrl, uint32_t interrupt_id);
+  bool load(reg_t addr, size_t len, uint8_t* bytes);
+  bool store(reg_t addr, size_t len, const uint8_t* bytes);
+  void send_byte(uint8_t byte);
+
+ private:
+  abstract_interrupt_controller_t *intctrl;
+  uint32_t interrupt_id;
+  uint32_t cntrl_regs;
+  std::queue<uint8_t> rx_queue;
+};
+
 class ns16550_t : public abstract_device_t {
  public:
   ns16550_t(class bus_t *bus, abstract_interrupt_controller_t *intctrl,

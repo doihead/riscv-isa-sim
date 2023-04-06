@@ -15,6 +15,11 @@
 #define NS16550_REG_SHIFT  0
 #define NS16550_REG_IO_WIDTH 1
 #define NS16550_INTERRUPT_ID 1
+#define ALTPS2_BASE        0x10000100
+#define ALTPS2_SIZE        8
+#define ALTPS2_INTERRUPT_ID  2
+#define FB_BASE            0x40000000
+#define FB_SIZE            1920000
 #define EXT_IO_BASE        0x40000000
 #define DRAM_BASE          0x80000000
 
