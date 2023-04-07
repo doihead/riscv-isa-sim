@@ -72,6 +72,7 @@ riscv_srcs = \
 	cfg.cc \
 	$(riscv_gen_srcs) \
 	framebuffer.cc \
+	altera_ps2.cc \
 
 riscv_test_srcs =
 
