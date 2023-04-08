@@ -58,8 +58,7 @@ sim_t::sim_t(const cfg_t *cfg, bool halted,
     histogram_enabled(false),
     log(false),
     remote_bitbang(NULL),
-    debug_module(this, dm_config),
-    framebuffer(fb_device_t())
+    debug_module(this, dm_config)
 {
   signal(SIGINT, &handle_signal);
 
@@ -70,8 +69,6 @@ sim_t::sim_t(const cfg_t *cfg, bool halted,
 
   for (auto& x : plugin_devices)
     bus.add_device(x.first, x.second);
-
-  bus.add_device(0x40000000, &framebuffer);
 
   debug_module.add_device(&bus);
 
@@ -152,10 +149,15 @@ sim_t::sim_t(const cfg_t *cfg, bool halted,
     bus.add_device(ns16550_base, ns16550.get());
   }
 
+  // create ps2 controller
   ps2.reset(new altera_ps2_t(intctrl, ALTPS2_INTERRUPT_ID));
 
   bus.add_device(ALTPS2_BASE, ps2.get());
   
+  framebuffer.reset(new fb_device_t());
+  bus.add_device(0x40000000, framebuffer.get());
+
+
   //per core attribute
   int cpu_offset = 0, rc;
   size_t cpu_idx = 0;

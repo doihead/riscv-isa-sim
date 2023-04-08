@@ -5,11 +5,12 @@
 altera_ps2_t::altera_ps2_t(abstract_interrupt_controller_t *intctrl, uint32_t interrupt_id)
   : intctrl(intctrl), interrupt_id(interrupt_id), cntrl_regs(0)
 {
-  printf("Initialized PS/2 Controller");
+  printf("Initialized PS/2 Controller\n");
 }
 
 bool altera_ps2_t::load(reg_t addr, size_t len, uint8_t* bytes)
 {
+  printf("ps2 read from@%X\n", addr);
   // Enforcing 32 bit accesses to the device because I can't seem to find any docs on what's
   // supposed to happen for partial reads of the data register and all the drivers I could find
   // only do word/dword reads
@@ -35,6 +36,8 @@ bool altera_ps2_t::load(reg_t addr, size_t len, uint8_t* bytes)
 
 bool altera_ps2_t::store(reg_t addr, size_t len, const uint8_t* bytes)
 {
+  printf("ps2 written to@0x%X\nTrying to write 0x%X\n", addr, * ((int*) bytes));
+
   if (addr + len > ALTERAPS2_SIZE)
     return false;
   if (addr == 0) {

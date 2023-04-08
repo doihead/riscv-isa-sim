@@ -75,6 +75,7 @@ private:
   std::unique_ptr<plic_t> plic;
   std::unique_ptr<ns16550_t> ns16550;
   std::unique_ptr<altera_ps2_t> ps2;
+  std::unique_ptr<fb_device_t> framebuffer;
   bus_t bus;
   log_file_t log_file;
 
@@ -147,7 +148,6 @@ private:
   virtual size_t chunk_max_size() override { return 8; }
   virtual endianness_t get_target_endianness() const override;
 
-  fb_device_t framebuffer;
 public:
   // Initialize this after procs, because in debug_module_t::reset() we
   // enumerate processors, which segfaults if procs hasn't been initialized
