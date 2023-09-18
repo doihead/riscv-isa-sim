@@ -254,6 +254,7 @@ void sim_t::step(size_t n)
         current_proc = 0;
         if (clint) clint->increment(INTERLEAVE / INSNS_PER_RTC_TICK);
         if (ns16550) ns16550->tick();
+        if (ps2) ps2->tick();
       }
     }
   }

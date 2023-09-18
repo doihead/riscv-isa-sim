@@ -140,13 +140,18 @@ class altera_ps2_t : public abstract_device_t {
   altera_ps2_t(abstract_interrupt_controller_t *intctrl, uint32_t interrupt_id);
   bool load(reg_t addr, size_t len, uint8_t* bytes);
   bool store(reg_t addr, size_t len, const uint8_t* bytes);
-  void send_byte(uint8_t byte);
+  void tick();
 
  private:
   abstract_interrupt_controller_t *intctrl;
   uint32_t interrupt_id;
-  uint32_t cntrl_regs;
+  bool irq_enable = false;
+  bool irq_pending = false;
+  bool send_error = false;
   std::queue<uint8_t> rx_queue;
+
+  int tx_mqd;
+  int rx_mqd;
 };
 
 class ns16550_t : public abstract_device_t {

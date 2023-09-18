@@ -1,61 +1,84 @@
 #include "devices.h"
+#include <mqueue.h>
 
 #define ALTERAPS2_SIZE 8
 
 altera_ps2_t::altera_ps2_t(abstract_interrupt_controller_t *intctrl, uint32_t interrupt_id)
-  : intctrl(intctrl), interrupt_id(interrupt_id), cntrl_regs(0)
+  : intctrl(intctrl), interrupt_id(interrupt_id)
 {
-  printf("Initialized PS/2 Controller\n");
+  printf("Starting to init ps2\n");
+  tx_mqd = mq_open ("/spike-ps2kbdrx", O_WRONLY);
+  if (tx_mqd < 0) {
+    perror("mq_open() tx_mqd");
+  }
+  rx_mqd = mq_open ("/spike-ps2kbdtx", O_RDONLY | O_CREAT | O_NONBLOCK);
+  if (rx_mqd < 0) {
+    perror("mq_open() rx_mqd");
+  }
+  printf("Init ps2\n");
+
 }
 
 bool altera_ps2_t::load(reg_t addr, size_t len, uint8_t* bytes)
 {
-  printf("ps2 read from@%X\n", addr);
   // Enforcing 32 bit accesses to the device because I can't seem to find any docs on what's
   // supposed to happen for partial reads of the data register and all the drivers I could find
   // only do word/dword reads
-  if (addr > ALTERAPS2_SIZE || len != 4)
+  if (len != 4)
     return false;
   
-  if (addr < 4){
+  if (addr == 0){
+    intctrl->set_interrupt_level(interrupt_id, 0);
     if (rx_queue.empty()) {
       memset(bytes, 0, 4);
     } else {
-      bytes[0] = rx_queue.size() >> 8;
-      bytes[1] = rx_queue.size() & 0xFF;
-      bytes[2] = 0x80;
-      bytes[3] = rx_queue.front();
+      bytes[0] = rx_queue.front();
+      bytes[1] = 0x80;
+      bytes[2] = rx_queue.size() & 0xFF;
+      bytes[3] = rx_queue.size() >> 8;
+
+      //printf("ps2 read %X\n", *((int*) bytes));
 
       rx_queue.pop();
     }
-  } else {
-    memcpy(bytes, &cntrl_regs, 4);
+  }
+
+  //Again ignoring PS2 Errors for now
+  else if (addr == 4) {
+    bytes[0] = irq_enable ? 1 : 0;
+    bytes[1] = irq_pending ? 1 : 0;
   }
   return true;
 }
 
 bool altera_ps2_t::store(reg_t addr, size_t len, const uint8_t* bytes)
 {
-  printf("ps2 written to@0x%X\nTrying to write 0x%X\n", addr, * ((int*) bytes));
-
-  if (addr + len > ALTERAPS2_SIZE)
+  if (len != 4)
     return false;
   if (addr == 0) {
-    printf("Trying to send: %x\n", bytes[0]);
+    //printf("sending %X\n", bytes[0]);
+    mq_send (tx_mqd, (char*) bytes, 1, 0);
     return true;
   }
 
+  //Ignoring PS2 Errors for now
   else if (addr == 4) {
-    cntrl_regs |= (bytes[0] & 0x1);
+    irq_enable = (bytes[0] & 0x1);
     return true;
   }
   return false;
 }
 
-void altera_ps2_t::send_byte(uint8_t byte)
+void altera_ps2_t::tick()
 {
-  rx_queue.push(byte);
-  if (cntrl_regs & 1) {
-    intctrl->set_interrupt_level(interrupt_id, 1);
+  char recieved_byte;
+
+  if (mq_receive (rx_mqd, &recieved_byte, 1, NULL) > -1) {
+    //printf("Recieving %X\n", recieved_byte);
+    rx_queue.push(recieved_byte);
+    if (irq_enable) {
+      irq_pending = true;
+      intctrl->set_interrupt_level(interrupt_id, 1);
+    }
   }
 }

@@ -141,7 +141,7 @@ std::string make_dts(size_t insns_per_rtc_tick, size_t cpu_hz,
          "    };\n"
          "    ps2@" << ALTPS2_BASE << " {\n"
          "      compatible = \"altr,ps2-1.0\";\n"
-         "      reg = <0x0 0x" << ALTPS2_BASE << " 0x0 " << ALTPS2_SIZE << ">;\n"
+         "      reg = <0x0 0x" << ALTPS2_BASE << " 0x0 0x" << ALTPS2_SIZE << ">;\n"
          "      interrupt-parent = <&PLIC>;\n"
          "      interrupts = <" << std::dec << ALTPS2_INTERRUPT_ID << ">;\n"
          "    };\n"
